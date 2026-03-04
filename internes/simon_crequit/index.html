@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ObstétriLog</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+
+  :root {
+    --primary: #1a5c7a;
+    --primary-light: #e8f4f9;
+    --primary-mid: #2d7fa8;
+    --accent: #e07b4f;
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --border: #dde3ea;
+    --text: #1c2b36;
+    --text-soft: #6b7f8c;
+    --debutant: #b0bec5;
+    --encours: #64b5f6;
+    --acquis: #66bb6a;
+    --expert: #ffa726;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(26,92,122,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .app-header {
+    background: var(--primary);
+    color: white;
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.01em;
+  }
+  .header-sub { font-size: 0.75rem; opacity: 0.75; margin-top: 1px; }
+
+  /* NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(26,92,122,0.06);
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-soft);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    gap: 3px;
+    transition: color 0.2s;
+  }
+  .nav-btn.active { color: var(--primary); }
+  .nav-btn svg { width: 22px; height: 22px; }
+
+  /* SCREENS */
+  .screen { display: none; padding: 18px 16px; animation: fadeIn 0.2s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION TITLES */
+  .section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin: 20px 0 10px;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  /* PROFILE SCREEN */
+  #screen-profil .profile-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-mid) 100%);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    color: white;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .profile-avatar {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 1.6rem;
+  }
+  .profile-name { font-family: 'DM Serif Display', serif; font-size: 1.3rem; }
+  .profile-sem { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 0.78rem; font-weight: 600; color: var(--text-soft); margin-bottom: 5px; display: block; }
+  .form-input, .form-select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--primary); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; width: 100%; }
+  .btn-primary:active { background: var(--primary-mid); }
+  .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); width: 100%; }
+
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+  .stat-box {
+    background: var(--primary-light);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-val { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+  .stat-lbl { font-size: 0.7rem; color: var(--text-soft); margin-top: 2px; }
+
+  /* SAISIE SCREEN */
+  .cat-filter {
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+  .cat-filter::-webkit-scrollbar { display: none; }
+  .cat-chip {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-soft);
+  }
+  .cat-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  .competence-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .competence-item:active { border-color: var(--primary); background: var(--primary-light); }
+  .comp-label { font-size: 0.9rem; font-weight: 500; }
+  .comp-cat { font-size: 0.72rem; color: var(--text-soft); margin-top: 3px; }
+  .comp-last { font-size: 0.72rem; margin-top: 6px; display: flex; align-items: center; gap: 5px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 36px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; }
+  .modal-cat { font-size: 0.78rem; color: var(--text-soft); margin-bottom: 20px; }
+
+  .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .level-btn {
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .level-btn .level-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin: 0 auto 6px;
+  }
+  .level-btn .level-name { font-size: 0.8rem; font-weight: 600; }
+  .level-btn .level-desc { font-size: 0.68rem; color: var(--text-soft); margin-top: 2px; }
+  .level-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+  .level-btn[data-level="0"] .level-dot { background: var(--debutant); }
+  .level-btn[data-level="1"] .level-dot { background: var(--encours); }
+  .level-btn[data-level="2"] .level-dot { background: var(--acquis); }
+  .level-btn[data-level="3"] .level-dot { background: var(--expert); }
+
+  .comfort-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+  .comfort-btn {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.4rem;
+    transition: all 0.15s;
+  }
+  .comfort-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+
+  /* PORTFOLIO SCREEN */
+  .portfolio-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+  .portfolio-filters::-webkit-scrollbar { display: none; }
+
+  .portfolio-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .portfolio-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .portfolio-card-label { font-size: 0.88rem; font-weight: 600; flex: 1; }
+  .level-badge {
+    font-size: 0.68rem; font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    color: white;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+  .badge-0 { background: var(--debutant); color: #333; }
+  .badge-1 { background: var(--encours); }
+  .badge-2 { background: var(--acquis); }
+  .badge-3 { background: var(--expert); color: #333; }
+
+  .svg-chart { width: 100%; height: 70px; display: block; }
+
+  .export-zone { margin-top: 20px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 300;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-soft);
+  }
+  .empty-state svg { opacity: 0.3; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.88rem; }
+
+  .history-list { margin-top: 10px; }
+  .history-entry {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+  }
+  .history-entry:last-child { border-bottom: none; }
+  .history-date { color: var(--text-soft); }
+  .history-right { display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <h1>ObstétriLog</h1>
+    <div class="header-sub" id="header-sub">Mon carnet de bord</div>
+  </div>
+  <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z" fill="rgba(255,255,255,0.7)"/></svg>
+</header>
+
+<!-- SCREENS -->
+<div id="screen-saisie" class="screen active">
+  <div class="cat-filter" id="cat-filter-saisie"></div>
+  <div style="margin-top:14px" id="comp-list"></div>
+</div>
+
+<div id="screen-portfolio" class="screen">
+  <div class="portfolio-filters" id="portfolio-filters"></div>
+  <div style="margin-top:14px" id="portfolio-list"></div>
+  <div class="export-zone">
+    <button class="btn btn-outline" onclick="exportJSON()">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 3h14v2H5v-2z" fill="currentColor"/></svg>
+      Exporter mon portfolio (JSON)
+    </button>
+    <button class="btn btn-outline" onclick="document.getElementById('import-input').click()" style="margin-top:10px;border-color:var(--accent);color:var(--accent)">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 8l5 5h-3v7h-4v-7H7l5-5zm-7 13h14v2H5v-2z" fill="currentColor"/></svg>
+      Importer un portfolio (JSON)
+    </button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
+    <p style="font-size:0.72rem;color:var(--text-soft);margin-top:10px;text-align:center">
+      L'import fusionne les saisies sans écraser les données existantes.
+    </p>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('saisie')" id="nav-saisie">
+    <svg fill="none" viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+    Saisie
+  </button>
+  <button class="nav-btn" onclick="switchTab('portfolio')" id="nav-portfolio">
+    <svg fill="none" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" fill="currentColor"/></svg>
+    Portfolio
+  </button>
+</nav>
+
+<!-- MODAL SAISIE -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-comp-label"></div>
+    <div class="modal-cat" id="modal-comp-cat"></div>
+
+    <div class="section-title">Niveau atteint</div>
+    <div class="level-grid">
+      <button class="level-btn" data-level="0" onclick="selectLevel(0)">
+        <div class="level-dot"></div>
+        <div class="level-name">Débutant</div>
+        <div class="level-desc">Notions de base</div>
+      </button>
+      <button class="level-btn" data-level="1" onclick="selectLevel(1)">
+        <div class="level-dot"></div>
+        <div class="level-name">En cours</div>
+        <div class="level-desc">En acquisition</div>
+      </button>
+      <button class="level-btn" data-level="2" onclick="selectLevel(2)">
+        <div class="level-dot"></div>
+        <div class="level-name">Acquis</div>
+        <div class="level-desc">Maîtrisé</div>
+      </button>
+      <button class="level-btn" data-level="3" onclick="selectLevel(3)">
+        <div class="level-dot"></div>
+        <div class="level-name">Expert</div>
+        <div class="level-desc">Référence possible</div>
+      </button>
+    </div>
+
+    <div class="section-title">Ressenti</div>
+    <div class="comfort-row">
+      <button class="comfort-btn" data-comfort="0" onclick="selectComfort(0)">😟</button>
+      <button class="comfort-btn" data-comfort="1" onclick="selectComfort(1)">😐</button>
+      <button class="comfort-btn" data-comfort="2" onclick="selectComfort(2)">😊</button>
+    </div>
+
+    <div class="section-title">Date de l'acte</div>
+    <div class="form-group" style="margin-bottom:20px">
+      <input class="form-input" type="datetime-local" id="entry-date" />
+    </div>
+
+    <button class="btn btn-primary" id="modal-save-btn" onclick="saveEntry()">Enregistrer cette saisie</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────
+const COMPETENCES = [{"id":"c1","cat":"Accouchement","label":"Accouchement voie basse eutocique"},{"id":"c2","cat":"Accouchement","label":"Accouchement sur présentation du siège"},{"id":"c3","cat":"Accouchement","label":"Épisiotomie et réfection périnéale"},{"id":"c4","cat":"Chirurgie","label":"Césarienne — 1er aide"},{"id":"c5","cat":"Chirurgie","label":"Césarienne — Opérateur principal"},{"id":"c6","cat":"Chirurgie","label":"Révision utérine"},{"id":"c7","cat":"Urgences","label":"Hémorragie du post-partum — prise en charge"},{"id":"c8","cat":"Urgences","label":"Éclampsie — prise en charge"},{"id":"c9","cat":"Urgences","label":"Extraction instrumentale (ventouse/forceps)"},{"id":"c10","cat":"Prénatal","label":"Amniocentèse"},{"id":"c11","cat":"Prénatal","label":"Version par manœuvre externe"},{"id":"c12","cat":"Prénatal","label":"Cerclage du col"}];
+const INTERN_PRENOM = 'simon';
+const INTERN_NOM = 'crequit';
+const INTERN_SEMESTRE = 'S1';
+
+const LEVELS = ['Débutant', 'En cours', 'Acquis', 'Expert'];
+const LEVEL_COLORS = ['#b0bec5','#64b5f6','#66bb6a','#ffa726'];
+const COMFORT_LABELS = ['😟','😐','😊'];
+
+let entries = JSON.parse(localStorage.getItem('ol_entries') || '[]');
+
+let currentComp = null;
+let selectedLevel = null;
+let selectedComfort = null;
+let activeCatSaisie = 'all';
+let activeCatPortfolio = 'all';
+
+// ─── INIT ────────────────────────────────────────────────────────────────
+function init() {
+  document.getElementById('header-sub').textContent = `${INTERN_PRENOM} ${INTERN_NOM} · ${INTERN_SEMESTRE}`;
+  buildCatFilters();
+  renderSaisie();
+  renderPortfolio();
+}
+
+
+// ─── CATEGORIES ──────────────────────────────────────────────────────────
+function getCategories() {
+  return [...new Set(COMPETENCES.map(c => c.cat))];
+}
+
+function buildCatFilters() {
+  const cats = getCategories();
+  // Saisie
+  const sf = document.getElementById('cat-filter-saisie');
+  sf.innerHTML = '';
+  const allBtnS = document.createElement('button');
+  allBtnS.className = 'cat-chip active';
+  allBtnS.textContent = 'Toutes';
+  allBtnS.onclick = function() { filterSaisie('all', this); };
+  sf.appendChild(allBtnS);
+  cats.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-chip';
+    btn.textContent = c;
+    btn.onclick = function() { filterSaisie(c, this); };
+    sf.appendChild(btn);
+  });
+  // Portfolio
+  const pf = document.getElementById('portfolio-filters');
+  pf.innerHTML = '';
+  const allBtnP = document.createElement('button');
+  allBtnP.className = 'cat-chip active';
+  allBtnP.textContent = 'Toutes';
+  allBtnP.onclick = function() { filterPortfolio('all', this); };
+  pf.appendChild(allBtnP);
+  cats.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-chip';
+    btn.textContent = c;
+    btn.onclick = function() { filterPortfolio(c, this); };
+    pf.appendChild(btn);
+  });
+}
+
+function filterSaisie(cat, el) {
+  activeCatSaisie = cat;
+  document.querySelectorAll('#cat-filter-saisie .cat-chip').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderSaisie();
+}
+
+function filterPortfolio(cat, el) {
+  activeCatPortfolio = cat;
+  document.querySelectorAll('#portfolio-filters .cat-chip').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderPortfolio();
+}
+
+// ─── SAISIE ───────────────────────────────────────────────────────────────
+function renderSaisie() {
+  const list = document.getElementById('comp-list');
+  const filtered = activeCatSaisie === 'all' ? COMPETENCES : COMPETENCES.filter(c => c.cat === activeCatSaisie);
+  if (filtered.length === 0) { list.innerHTML = '<p style="color:var(--text-soft);text-align:center;padding:30px">Aucune compétence</p>'; return; }
+
+  list.innerHTML = filtered.map(c => {
+    const last = getLastEntry(c.id);
+    const badge = last ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:600;color:${LEVEL_COLORS[last.level]}">${COMFORT_LABELS[last.comfort]} ${LEVELS[last.level]}</span>` : `<span style="font-size:0.72rem;color:var(--text-soft)">Non renseigné</span>`;
+    const date = last ? `<span style="font-size:0.7rem;color:var(--text-soft)">${formatDate(last.date)}</span>` : '';
+    return `<div class="competence-item" onclick="openModal('${c.id}')">
+      <div class="comp-label">${c.label}</div>
+      <div class="comp-cat">${c.cat}</div>
+      <div class="comp-last">${badge}${date ? ' · ' + date : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function getLastEntry(compId) {
+  const e = entries.filter(e => e.compId === compId);
+  return e.length ? e[e.length-1] : null;
+}
+
+// ─── MODAL ────────────────────────────────────────────────────────────────
+function openModal(compId) {
+  currentComp = COMPETENCES.find(c => c.id === compId);
+  selectedLevel = null; selectedComfort = null;
+  document.getElementById('modal-comp-label').textContent = currentComp.label;
+  document.getElementById('modal-comp-cat').textContent = currentComp.cat;
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.comfort-btn').forEach(b => b.classList.remove('selected'));
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const localNow = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById('entry-date').value = localNow;
+  const last = getLastEntry(compId);
+  const isNew = !last;
+  document.getElementById('modal-save-btn').textContent = isNew ? 'Enregistrer cette saisie' : 'Ajouter une nouvelle saisie';
+  if (last) { selectLevel(last.level); selectComfort(last.comfort); }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function selectLevel(l) {
+  selectedLevel = l;
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`.level-btn[data-level="${l}"]`).classList.add('selected');
+}
+
+function selectComfort(c) {
+  selectedComfort = c;
+  document.querySelectorAll('.comfort-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`.comfort-btn[data-comfort="${c}"]`).classList.add('selected');
+}
+
+function saveEntry() {
+  if (selectedLevel === null) { showToast('Choisis un niveau.'); return; }
+  if (selectedComfort === null) { showToast('Choisis un ressenti.'); return; }
+  const dateVal = document.getElementById('entry-date').value;
+  const entryDate = dateVal ? new Date(dateVal).toISOString() : new Date().toISOString();
+  entries.push({ compId: currentComp.id, level: selectedLevel, comfort: selectedComfort, date: entryDate });
+  localStorage.setItem('ol_entries', JSON.stringify(entries));
+  document.getElementById('modal-overlay').classList.remove('open');
+  renderSaisie();
+  renderPortfolio();
+  showToast('Saisie enregistrée ✓');
+}
+
+// ─── PORTFOLIO ────────────────────────────────────────────────────────────
+function renderPortfolio() {
+  const list = document.getElementById('portfolio-list');
+  const filtered = activeCatPortfolio === 'all' ? COMPETENCES : COMPETENCES.filter(c => c.cat === activeCatPortfolio);
+  const withEntries = filtered.filter(c => entries.some(e => e.compId === c.id));
+  if (withEntries.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 14l-5-5 1.4-1.4L12 14.2l7.6-7.6L21 8l-9 9z" fill="currentColor"/></svg>
+      <p>Aucune saisie pour cette catégorie.<br>Commence par renseigner des compétences.</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = withEntries.map(c => buildPortfolioCard(c)).join('');
+}
+
+function buildPortfolioCard(comp) {
+  const compEntries = entries.filter(e => e.compId === comp.id).sort((a,b) => new Date(a.date)-new Date(b.date));
+  const last = compEntries[compEntries.length-1];
+  const svg = buildSVG(compEntries);
+  const hist = compEntries.slice(-3).reverse().map(e =>
+    `<div class="history-entry">
+      <span class="history-date">${formatDate(e.date)}</span>
+      <span class="history-right">
+        <span style="font-size:0.9rem">${COMFORT_LABELS[e.comfort]}</span>
+        <span style="font-size:0.78rem;font-weight:600;color:${LEVEL_COLORS[e.level]}">${LEVELS[e.level]}</span>
+      </span>
+    </div>`
+  ).join('');
+  return `<div class="portfolio-card">
+    <div class="portfolio-card-header">
+      <div class="portfolio-card-label">${comp.label}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="level-badge badge-${last.level}">${LEVELS[last.level]}</span>
+        <button onclick="openModal('${comp.id}')" style="background:var(--primary-light);border:none;border-radius:8px;padding:4px 10px;font-size:0.8rem;font-weight:600;color:var(--primary);cursor:pointer">+ Saisie</button>
+      </div>
+    </div>
+    ${svg}
+    <div class="history-list">${hist}</div>
+  </div>`;
+}
+
+function buildSVG(compEntries) {
+  if (compEntries.length < 2) {
+    const e = compEntries[0];
+    const x = 20; const y = 55 - (e.level / 3) * 40;
+    return `<svg class="svg-chart" viewBox="0 0 300 70">
+      <circle cx="${x}" cy="${y}" r="5" fill="${LEVEL_COLORS[e.level]}"/>
+    </svg>`;
+  }
+  const w = 300; const h = 70; const pad = 20;
+  const n = compEntries.length;
+  const xs = compEntries.map((_, i) => pad + (i / (n-1)) * (w - 2*pad));
+  const ys = compEntries.map(e => h - pad - (e.level / 3) * (h - 2*pad));
+  let d = `M ${xs[0]} ${ys[0]}`;
+  for (let i = 1; i < n; i++) {
+    const cx = (xs[i-1] + xs[i]) / 2;
+    d += ` C ${cx} ${ys[i-1]}, ${cx} ${ys[i]}, ${xs[i]} ${ys[i]}`;
+  }
+  const fillD = d + ` L ${xs[n-1]} ${h} L ${xs[0]} ${h} Z`;
+  const dots = compEntries.map((e, i) =>
+    `<circle cx="${xs[i]}" cy="${ys[i]}" r="4" fill="${LEVEL_COLORS[e.level]}" stroke="white" stroke-width="1.5"/>`
+  ).join('');
+  const lastColor = LEVEL_COLORS[compEntries[compEntries.length-1].level];
+  const uid = `g_${compEntries[0].compId}_${Math.floor(Math.random()*100000)}`;
+  return `<svg class="svg-chart" viewBox="0 0 ${w} ${h}">
+    <defs>
+      <linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${lastColor}" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="${lastColor}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${fillD}" fill="url(#${uid})"/>
+    <path d="${d}" fill="none" stroke="${lastColor}" stroke-width="2" stroke-linecap="round"/>
+    ${dots}
+  </svg>`;
+}
+
+// ─── EXPORT / IMPORT ─────────────────────────────────────────────────────────
+function exportJSON() {
+  const profile = { prenom: INTERN_PRENOM, nom: INTERN_NOM, semestre: INTERN_SEMESTRE };
+  const data = { profile, entries, exportDate: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const safeName = (INTERN_PRENOM + '_' + INTERN_NOM).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]/g,'_');
+  a.download = `obstétrilog_${safeName}_${INTERN_SEMESTRE}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Portfolio exporté ✓');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+
+      // Validation minimale
+      if (!data.entries || !Array.isArray(data.entries)) {
+        showToast('Fichier JSON invalide.'); return;
+      }
+
+      // Vérifier que le fichier correspond à cet interne
+      if (data.profile && data.profile.nom &&
+          data.profile.nom !== INTERN_NOM) {
+        showToast(`Ce portfolio appartient à ${data.profile.prenom || ''} ${data.profile.nom} — import annulé.`);
+        // Réinitialiser l'input pour permettre une nouvelle tentative
+        event.target.value = '';
+        return;
+      }
+
+      // Fusion : on construit une clé unique par entrée (compId + date ISO)
+      const existingKeys = new Set(
+        entries.map(e => e.compId + '|' + e.date)
+      );
+
+      const newEntries = data.entries.filter(e => {
+        // Entrée valide ?
+        if (!e.compId || e.level === undefined || e.comfort === undefined || !e.date) return false;
+        // Compétence connue dans cette app ?
+        if (!COMPETENCES.find(c => c.id === e.compId)) return false;
+        // Pas déjà présente ?
+        return !existingKeys.has(e.compId + '|' + e.date);
+      });
+
+      if (newEntries.length === 0) {
+        showToast('Aucune nouvelle saisie à importer.');
+        event.target.value = '';
+        return;
+      }
+
+      // Fusionner et sauvegarder
+      entries = entries.concat(newEntries)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      localStorage.setItem('ol_entries', JSON.stringify(entries));
+
+      renderSaisie();
+      renderPortfolio();
+      showToast(`${newEntries.length} saisie(s) importée(s) ✓`);
+
+    } catch(err) {
+      showToast('Erreur de lecture du fichier JSON.');
+    }
+    event.target.value = ''; // reset pour permettre de réimporter
+  };
+  reader.readAsText(file);
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+init();
+</script>
+</body>
+</html>
